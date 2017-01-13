@@ -1,0 +1,37 @@
+#!/bin/bash
+hello="A B C D"
+echo $hello # A B C D
+echo "$hello" # A B C D
+# 正如我们所见，echo $hello 与 echo "$hello" 的结果不同。
+
+# =========================
+# 引用一个变量将会保留空白符。
+# =========================
+echo
+echo '$hello' # $hello
+# ^ ^
+# 单引号将会禁用（转义）变量引用，这导致 "$" 将会以字符的形式被解析。
+# 需要注意不同形式引用的效果。
+
+# -----------------------------------------------
+# 允许使用空白符分割，从而在一行内对多个变量进行赋值。
+# 这将会降低可读性，并且可能会导致不兼容。
+var1=21 var2=22 var3=$V3
+echo
+echo "var1=$var1 var2=$var2 var3=$var3"
+# 在一些老版本的 shell 中可能会有问题。
+# -----------------------------------------------
+echo; echo
+
+# 转义空格也可以达到相同的效果。
+mixed_bag=2\ ---\ Whatever
+#使用 \ 转义空格
+echo "$mixed_bag" # 2 --- Whatever
+echo; echo
+
+
+#在赋值前使用变量可能会导致错误。但是，在算术运算中使用未赋值变量时可行的。
+# uninitialized=1
+echo "$uninitialized" # 空行
+let "uninitialized += 5" # 加上5
+echo "$uninitialized" # 5
