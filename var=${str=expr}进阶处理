@@ -1,0 +1,52 @@
+请学员务必能识别null value 与 unset的本质区别， 这在一些进阶的变量处理上是很严格的。
+
+比方说：
+
+$ str=    #设为null
+$ var=${str=expr} #定义var
+$ echo $var
+
+$ echo $str
+
+$ unset str #取消str
+$ var=${str=expr} #定义var
+$ echo $var
+expr
+$ echo $str
+expr
+
+首先，var=$str 这个大家都可理解吧。
+而接下来的思考方向是，究竟$str 这个变量是如下哪一种情况呢：
+PDF created with pdfFactory Pro trial version www.pdffactory.com
+-16-
+1) unset
+2) null
+3) not null
+1) 假如是unset ，那么 var=${str=expr} 的结果将是：
+var=expr
+str=expr
+2) 假如是null ，那 var=${str=expr} 的结果是：
+var=
+str=
+3) 假如是not null (比方为xyz )，那 var=${str=expr} 之结果是：
+var=xyz
+str=xyz
+接下来，再来看看 var=${str:=expr} 好了：
+1) $str 为not set ：
+var=expr
+str=expr
+2) $str 为null ：
+var=expr
+str=expr
+3) $str 为not null (str=xyz)：
+var=xyz
+str=xyz
+最后比教一下 ${str=expr} 与 ${str:=expr} ：
+* 两者在 not set 与 not null 都一至
+* 但当 null 值时，前者会将$var 与$str 都设为 null ，但后者则设为 expr
+从这个再延伸出其它模拟，不防请大家"实作"观查一下有何不同？--与上面的结论一样
+var=${str-expr} vs var=${str:-expr}
+var=${str+expr} vs var=${str:+expr}
+var=${str?expr} vs var=${str:?expr}
+
+
