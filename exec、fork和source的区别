@@ -1,0 +1,70 @@
+eg：
+#!/bin/bash 
+
+A=B 
+echo "PID for 1.sh before exec/source/fork:$$"
+
+export A
+echo "1.sh: \$A is $A"
+
+case $1 in
+        exec)
+                echo "using exec..."
+                exec ./2.sh ;;
+        source)
+                echo "using source..."
+                . ./2.sh ;;
+        *)
+                echo "using fork by default..."
+                ./2.sh ;;
+esac
+
+echo "PID for 1.sh after exec/source/fork:$$"
+echo "1.sh: \$A is $A"
+2.sh
+
+#!/bin/bash
+
+echo "PID for 2.sh: $$"
+echo "2.sh get \$A=$A from 1.sh"
+
+A=C
+export A
+echo "2.sh: \$A is $A"
+然后分别跑如下参数来观察结果：
+
+$ ./1.sh fork
+$ ./1.sh source
+$ ./1.sh exec
+
+./1.sh fork
+PID for 1.sh before exec/source/fork:16356
+1.sh: $A is B
+using fork by default...
+PID for 2.sh: 16357
+2.sh get $A=B from 1.sh
+2.sh: $A is C
+PID for 1.sh after exec/source/fork:16356
+1.sh: $A is B
+#fork:1.sh(pid=16356)调用的2.sh是子shell(pid=16357)
+
+./1.sh source
+PID for 1.sh before exec/source/fork:16358
+1.sh: $A is B
+using source...
+PID for 2.sh: 16358
+2.sh get $A=B from 1.sh
+2.sh: $A is C
+PID for 1.sh after exec/source/fork:16358
+1.sh: $A is C
+#source:在当前shell执行(pid=16358)
+
+./1.sh exec
+PID for 1.sh before exec/source/fork:16359
+1.sh: $A is B
+using exec...
+PID for 2.sh: 16359
+2.sh get $A=B from 1.sh
+2.sh: $A is C
+#exec:原有的1.sh执行完之后再执行2.sh
+#exec 让script在同一个进程(pid=16359)上执行，但是原有进程则被结束了。
